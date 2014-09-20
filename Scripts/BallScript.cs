@@ -1,9 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class BallScript : MonoBehaviour {
 
-    private float grav = 5f;
+    private float swingRange;
+
+    private System.Random rnd = new System.Random();
+
+    private float grav = 8f;
 
     private float yMax = -200f;
 
@@ -13,7 +18,7 @@ public class BallScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        velocity = new Vector3(0f, 100f, 800f);
+        velocity = new Vector3(0f, 150f, 800f);
 	}
 	
 	// Update is called once per frame
@@ -29,7 +34,6 @@ public class BallScript : MonoBehaviour {
             velocity.y = yMax;
         }
         this.transform.position += velocity/7000f;
-        Debug.Log(velocity.z);
     }
 
     void OnCollisionEnter (Collision col)
@@ -44,10 +48,23 @@ public class BallScript : MonoBehaviour {
             {
                 velocity.z *= -1;
             }
-            if (col.gameObject.name == "Player1Swing")
+            if (col.gameObject.name == "Player1RSwing")
             {
+                velocity.y = 150f;
                 velocity.z *= -1;
-                float temp = col.transform.position.x - this.transform.position.x;
+                float temp = this.transform.position.x - col.transform.position.x;
+                velocity.z = (velocity.z / Math.Abs(velocity.z)) * 400f + 70f * (-20 * temp * temp + 8);
+                swingRange = rnd.Next(500, 600);
+                velocity.x = 150 * temp / (swingRange / velocity.z);
+            }
+            if (col.gameObject.name == "Player1LSwing")
+            {
+                velocity.y = 150f;
+                velocity.z *= -1;
+                float temp = this.transform.position.x - col.transform.position.x;
+                velocity.z = (velocity.z / Math.Abs(velocity.z)) * 400f + 70f * (-20 * temp * temp + 8);
+                swingRange = rnd.Next(500, 600);
+                velocity.x = 150 * temp / (swingRange / velocity.z);
             }
         }
         collided = true;

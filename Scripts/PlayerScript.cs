@@ -9,19 +9,25 @@ public class PlayerScript : MonoBehaviour {
 
     public bool served = false;
 
+    private float tableCenter;
+
     private GameObject ball;
 
     private bool swingWait = false;
 
     private Vector2 movement;
 
-    private Transform paddle;
+    private GameObject paddleR;
+    private GameObject paddleL;
 
 	// Use this for initialization
 	void Start ()
     {
-        paddle = transform.Find("Player1Swing");
-        paddle.collider.enabled = false;
+        paddleR = GameObject.Find("Player1RSwing");
+        paddleR.collider.enabled = false;
+        paddleL = GameObject.Find("Player1LSwing");
+        paddleL.collider.enabled = false;
+        tableCenter = GameObject.Find("Table").transform.position.x;
 	}
 	
 	// Update is called once per frame
@@ -30,18 +36,35 @@ public class PlayerScript : MonoBehaviour {
 	    float inputX = Input.GetAxis("Horizontal");
         float inputY = Input.GetAxis("Vertical");
 
-        if (Input.GetButton("Swing"))
+        if (Input.GetButton("SwingR"))
         {
             if (!served)
             {
                 served = true;
-                ball = (GameObject) Instantiate(ballPrefab, new Vector3(paddle.position.x, paddle.position.y, paddle.position.z + .3f), Quaternion.identity);
+                ball = (GameObject) Instantiate(ballPrefab, new Vector3(paddleR.transform.position.x, paddleR.transform.position.y, paddleR.transform.position.z + .3f), Quaternion.identity);
             }
             else
             {
                 if (!swingWait)
                 {
-                    paddle.collider.enabled = true;
+                    paddleR.collider.enabled = true;
+                    swingWait = true;
+                    Invoke("DisablePaddleCollider", 0.5f);
+                    Invoke("SwingWait", 0.8f);
+                }
+            }
+        } else if (Input.GetButton("SwingL"))
+        {
+            if (!served)
+            {
+                served = true;
+                ball = (GameObject)Instantiate(ballPrefab, new Vector3(paddleL.transform.position.x, paddleL.transform.position.y, paddleL.transform.position.z + .3f), Quaternion.identity);
+            }
+            else
+            {
+                if (!swingWait)
+                {
+                    paddleL.collider.enabled = true;
                     swingWait = true;
                     Invoke("DisablePaddleCollider", 0.5f);
                     Invoke("SwingWait", 0.8f);
@@ -49,6 +72,14 @@ public class PlayerScript : MonoBehaviour {
             }
         }
         movement = new Vector2(speed.x * inputX, speed.y * inputY);
+
+        if (this.transform.position.x > tableCenter && this.transform.localScale.x != -5)
+        {
+            this.transform.localScale = new Vector3(-5, 5, 1);
+        } else if (this.transform.position.x < tableCenter && this.transform.localScale.x != 5)
+        {
+            this.transform.localScale = new Vector3(5, 5, 1);
+        }
 	}
 
     void FixedUpdate()
@@ -58,7 +89,8 @@ public class PlayerScript : MonoBehaviour {
 
     void DisablePaddleCollider()
     {
-        paddle.collider.enabled = false;
+        paddleR.collider.enabled = false;
+        paddleL.collider.enabled = false;
     }
 
     void SwingWait()

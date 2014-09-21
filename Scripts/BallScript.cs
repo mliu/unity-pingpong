@@ -50,19 +50,19 @@ public class BallScript : MonoBehaviour {
             }
             if (col.gameObject.name == "Player1RSwing")
             {
-                velocity.y = 150f;
+                velocity.y = rnd.Next(160, 200);
                 velocity.z *= -1;
                 float temp = this.transform.position.x - col.transform.position.x;
-                velocity.z = (velocity.z / Math.Abs(velocity.z)) * 400f + 70f * (-20 * temp * temp + 8);
+                velocity.z = (velocity.z / Math.Abs(velocity.z)) * (400f + 70f * (-20 * temp * temp + 8));
                 swingRange = rnd.Next(500, 600);
                 velocity.x = 150 * temp / (swingRange / velocity.z);
             }
             if (col.gameObject.name == "Player1LSwing")
             {
-                velocity.y = 150f;
+                velocity.y = rnd.Next(130, 200);
                 velocity.z *= -1;
                 float temp = this.transform.position.x - col.transform.position.x;
-                velocity.z = (velocity.z / Math.Abs(velocity.z)) * 400f + 70f * (-20 * temp * temp + 8);
+                velocity.z = (velocity.z / Math.Abs(velocity.z)) * (400f + 70f * (-20 * temp * temp + 8));
                 swingRange = rnd.Next(500, 600);
                 velocity.x = 150 * temp / (swingRange / velocity.z);
             }

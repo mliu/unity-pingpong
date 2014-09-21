@@ -3,19 +3,23 @@ using System.Collections;
 
 public class PlayerScript : MonoBehaviour {
 
-    public Vector2 speed = new Vector2(5, 2);
+    public Vector3 speed = new Vector3(5, 0, 2);
 
     public GameObject ballPrefab;
 
     public bool served = false;
 
-    private float tableCenter;
+    private Vector3 tableCenter;
+    private Vector3 initCenter;
+
+    private float playerBoundingX = 2.8f;
+    private float playerBoundingZ = .4f;
 
     private GameObject ball;
 
     private bool swingWait = false;
 
-    private Vector2 movement;
+    private Vector3 movement;
 
     private GameObject paddleR;
     private GameObject paddleL;
@@ -27,14 +31,15 @@ public class PlayerScript : MonoBehaviour {
         paddleR.collider.enabled = false;
         paddleL = GameObject.Find("Player1LSwing");
         paddleL.collider.enabled = false;
-        tableCenter = GameObject.Find("Table").transform.position.x;
+        tableCenter = GameObject.Find("Table").transform.position;
+        initCenter = this.transform.position;
 	}
 	
 	// Update is called once per frame
 	void Update () 
     {
 	    float inputX = Input.GetAxis("Horizontal");
-        float inputY = Input.GetAxis("Vertical");
+        float inputZ = Input.GetAxis("Vertical");
 
         if (Input.GetButton("SwingR"))
         {
@@ -71,12 +76,12 @@ public class PlayerScript : MonoBehaviour {
                 }
             }
         }
-        movement = new Vector2(speed.x * inputX, speed.y * inputY);
+        movement = new Vector3(speed.x * inputX, 0, speed.z * inputZ);
 
-        if (this.transform.position.x > tableCenter && this.transform.localScale.x != -5)
+        if (this.transform.position.x > tableCenter.x && this.transform.localScale.x != -5)
         {
             this.transform.localScale = new Vector3(-5, 5, 1);
-        } else if (this.transform.position.x < tableCenter && this.transform.localScale.x != 5)
+        } else if (this.transform.position.x < tableCenter.x && this.transform.localScale.x != 5)
         {
             this.transform.localScale = new Vector3(5, 5, 1);
         }
@@ -84,7 +89,15 @@ public class PlayerScript : MonoBehaviour {
 
     void FixedUpdate()
     {
-        rigidbody2D.velocity = movement;
+        if (this.transform.position.x - tableCenter.x > playerBoundingX && movement.x > 0 || this.transform.position.x - tableCenter.x < -playerBoundingX && movement.x < 0)
+        {
+            movement.x = 0;
+        }
+        if (this.transform.position.z - initCenter.z > playerBoundingZ && movement.z > 0 || this.transform.position.z - initCenter.z < -playerBoundingZ && movement.z < 0)
+        {
+            movement.z = 0;
+        }
+        this.rigidbody.velocity = movement;
     }
 
     void DisablePaddleCollider()
